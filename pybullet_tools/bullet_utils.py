@@ -339,9 +339,12 @@ OBJ_YAWS = {
     'Microwave': PI, 'Toaster': PI / 2
 }
 
-def get_scale_by_category(file=None, category=None, scale = 1):
+def get_scale_by_category(file=None, category=None, scale=None):
     from world_builder.partnet_scales import MODEL_HEIGHTS, MODEL_SCALES, OBJ_SCALES
     from world_builder.utils import get_model_scale
+
+    if scale is not None:
+        return scale
 
     cat = category.lower()
 
@@ -1396,7 +1399,7 @@ def add_grasp_in_db(db, db_file, instance_name, grasps, name=None, LENGTH_VARIAN
     dump_json(db, db_file)
 
 
-def visualize_camera_image(image, index=0, img_dir='.', rgb=False, d=False, depth_map=True):
+def visualize_camera_image(image, index=0, img_dir='.', rgb=False, depth=False, depth_map=True):
     import matplotlib.pyplot as plt
 
     if not isdir(img_dir):

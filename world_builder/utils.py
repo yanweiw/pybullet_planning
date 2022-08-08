@@ -117,9 +117,13 @@ def get_model_scale(file, l=None, w=None, h=None, scale=1, category=None):
         scale = min(l / length, w / width) ## unable to construct
 
     ## ------ Case 3: given height of object
-    elif h is not None:
+    # elif h is not None:
+    #     height = extent[2]
+    #     scale = h/height
+    if h is not None:
         height = extent[2]
-        scale = h/height
+        if h/height < scale:
+            scale = h/height
 
     ## ------ Case N: exceptions
     if category is not None:
@@ -182,8 +186,8 @@ def get_file_by_category(category, RANDOM_INSTANCE=False, SAMPLING=False):
             paths = [join(asset_root, p) for p in ids]
             paths.sort()
             if RANDOM_INSTANCE:
-                np.random.seed(int(time.time()))
-                random.seed(time.time())
+                # np.random.seed(int(time.time()))
+                # random.seed(time.time())
                 sampled = False
                 if SAMPLING:
                     result = get_sampled_file(SAMPLING, category, ids)
@@ -236,6 +240,7 @@ def load_asset(category, x=0, y=0, yaw=0, floor=None, z=None, w=None, l=None, h=
 
     """ ============= load body by category ============= """
     file = get_file_by_category(category, RANDOM_INSTANCE=RANDOM_INSTANCE, SAMPLING=SAMPLING)
+    print(file)
     scale = get_scale_by_category(file=file, category=category, scale=scale)
     if file != None:
         if verbose: print(f"Loading ...... {abspath(file)}")

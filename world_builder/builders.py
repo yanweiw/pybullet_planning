@@ -7,7 +7,7 @@ from .entities import Object, Region, Environment, Robot, Camera, Floor, Stove,\
     Surface, Moveable, Supporter, Steerable, Door
 from .loaders import create_pr2_robot, load_rooms, load_cart, load_cart_regions, load_blocked_kitchen, \
     load_blocked_sink, load_blocked_stove, load_floor_plan, load_experiment_objects, load_pot_lid, load_basin_faucet, \
-    load_kitchen_mechanism, create_gripper_robot, load_cabinet_test_scene, load_random_mini_kitchen_counter
+    load_kitchen_mechanism, create_gripper_robot, load_cabinet_test_scene, load_random_mini_kitchen_counter, load_cabinet_rearrange_scene
 from .utils import load_asset, FLOOR_HEIGHT, WALL_HEIGHT, visualize_point
 from .world_generator import to_lisdf, save_to_kitchen_worlds
 
@@ -127,14 +127,18 @@ def test_feg_pick(world, floorplan='counter.svg', verbose=True):
 
     ## add all objects, with dynamic object instances randomly drawn from assets/{category}/
     ## and collision free poses randomly drawn for objects. all joints are set to closed state
-    pot, lid, turkey, counter, oil, vinegar = load_cabinet_test_scene(world, RANDOM_INSTANCE=True, verbose=verbose)
+
+    pot, lid, turkey, counter, oil, vinegar = load_cabinet_test_scene(world, floorplan, RANDOM_INSTANCE=True, verbose=verbose)
+    # pot, lid, turkey, veggie, counter, oil, vinegar = load_cabinet_rearrange_scene(world)
+
+
 
     """ ============== [Init] Add robot ==================== """
 
-    ## you may change robot initial state
-    custom_limits = {0: (0, 4), 1: (5, 12), 2: (0, 2)}  ## = {x: (x_min, x_max), y: ...}
-    initial_q = [0.9, 8, 0.7, 0, -math.pi / 2, 0]  ## = {x, y, z, roll, pitch, yaw}
-    robot = create_gripper_robot(world, custom_limits, initial_q=initial_q)
+    # ## you may change robot initial state
+    # custom_limits = {0: (0, 4), 1: (5, 12), 2: (0, 2)}  ## = {x: (x_min, x_max), y: ...}
+    # initial_q = [0.9, 8, 0.7, 0, -math.pi / 2, 0]  ## = {x, y, z, roll, pitch, yaw}
+    # robot = create_gripper_robot(world, custom_limits, initial_q=initial_q)
 
     """ ============== [Init] Modify initial object states ==================== """
 
@@ -146,10 +150,12 @@ def test_feg_pick(world, floorplan='counter.svg', verbose=True):
 
     ## --- Randomization Strategy 1:
     ## open a particular door with an epsilon greedy strategy
-    epsilon = 0.3
-    for door in [left_door, right_door]:
-        if random.random() < epsilon:
-            open_joint(door[0], door[1], extent=random.random())
+    
+    # epsilon = 0.3
+    # for door in [left_door, right_door]:
+    #     if random.random() < epsilon:
+    #         open_joint(door[0], door[1], extent=random.random())
+    
     # open_joint(left_door[0], left_door[1])
     # open_joint(right_door[0], right_door[1])
 
@@ -162,7 +168,9 @@ def test_feg_pick(world, floorplan='counter.svg', verbose=True):
     ## --- Just Checking:
     ## this is not the depth camera, which is small, 256 by 256 pixels in size
     ## this is the camera for viewing on your screen, defined in relation to a body, or robot
+
     set_camera_target_body(lid, dx=2, dy=0, dz=0.5)
+    
     # set_camera_target_body(right_door[0], link=right_door[1], dx=2, dy=0, dz=0.5)
     # wait_if_gui('proceed?')
 
@@ -173,22 +181,23 @@ def test_feg_pick(world, floorplan='counter.svg', verbose=True):
 
     ## --- Randomization Strategy 3:
     ## sample a movable and a surface
-    body = [oil, vinegar, turkey][random.randint(0, 2)]
-    surface = world.name_to_body('hitman_tmp')
 
-    goal_template = [
-        [('Holding', body)],
-        [('On', body, surface)],
-        [('On', body, surface), ('On', body, surface)]
-    ]
-    goal = random.choice(goal_template)
+    # body = [oil, vinegar, turkey][random.randint(0, 2)]
+    # surface = world.name_to_body('hitman_tmp')
+
+    # goal_template = [
+    #     [('Holding', body)],
+    #     [('On', body, surface)],
+    #     [('On', body, surface), ('On', body, surface)]
+    # ]
+    # goal = random.choice(goal_template)
 
     """ ============== [Output] Save depth image ==================== """
     ## you may purturb the camera pose ((point), (quaternian))
     camera_pose = ((3.7, 8, 1.3), (0.5, 0.5, -0.5, -0.5))
     world.add_camera(camera_pose)
 
-    return floorplan, goal
+    return floorplan
 
 ############################################
 
@@ -210,7 +219,7 @@ def sample_one_fridge_scene(world, verbose=True):
     world.set_skip_joints()
 
     """ ============== Sample an initial conf for robot ==================== """
-    world.robot.randomly_spawn()
+    # world.robot.randomly_spawn()
 
     """ ============== Add world objects ================ """
     minifridge_doors = load_random_mini_kitchen_counter(world)
@@ -223,9 +232,9 @@ def sample_one_fridge_scene(world, verbose=True):
             open_joint(door[0], door[1], extent=extent)
 
     """ ============== Check collisions ================ """
-    obstacles = [o for o in get_bodies() if o != world.robot]
-    while collided(world.robot, obstacles, verbose=verbose):
-        world.robot.randomly_spawn()
+    # obstacles = [o for o in get_bodies() if o != world.robot]
+    # while collided(world.robot, obstacles, verbose=verbose):
+    #     world.robot.randomly_spawn()
 
     return None
 
@@ -235,11 +244,11 @@ def sample_one_fridge_goal(world, verbose=True):
     fridge = world.name_to_body('minifridge')
     counter = world.name_to_body('counter')
 
-    arm = world.robot.arms[0]
+    # arm = world.robot.arms[0]
     goal_candidates = [
-        [('Holding', arm, cabbage)],
+        # [('Holding', arm, cabbage)],
         # [('On', cabbage, fridge)],
-        # [('On', cabbage, counter)],
+        [('On', cabbage, counter)],
     ]
     return random.choice(goal_candidates)
 

@@ -696,7 +696,7 @@ def load_gripper_test_scene(world):
     world.add_to_cat(lid, 'moveable')
     return pot, lid, turkey
 
-def load_cabinet_test_scene(world, RANDOM_INSTANCE=False, MORE_MOVABLE=False, verbose=True):
+def load_cabinet_test_scene(world, floorplan='counter.svg', RANDOM_INSTANCE=False, MORE_MOVABLE=False, verbose=True):
     surfaces = {
         'counter': {
             'front_left_stove': [],
@@ -719,7 +719,7 @@ def load_cabinet_test_scene(world, RANDOM_INSTANCE=False, MORE_MOVABLE=False, ve
     if MORE_MOVABLE:
         surfaces['counter']['hitman_tmp'].append('VeggieCabbage')
 
-    floor = load_floor_plan(world, plan_name='counter.svg', DEBUG=True, verbose=verbose,
+    floor = load_floor_plan(world, plan_name=floorplan, DEBUG=True, verbose=verbose,
                             surfaces=surfaces, spaces=spaces, RANDOM_INSTANCE=RANDOM_INSTANCE)
     world.remove_object(floor)
     pot, lid = load_pot_lid(world)

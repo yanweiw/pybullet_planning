@@ -453,13 +453,13 @@ def pddlstream_from_dir(problem, exp_dir, collisions=True, teleport=False):
 
 
 def get_depth_images(exp_dir, width=1280, height=960,  verbose=False, ## , width=720, height=560)
-<<<<<<< HEAD
-                     camera_pose=((3.7, 8, 1.3), (0.5, 0.5, -0.5, -0.5)),
-                     img_dir=join('visualizations', 'camera_images'), **kwargs):
-=======
+# <<<<<<< HEAD
+#                      camera_pose=((3.7, 8, 1.3), (0.5, 0.5, -0.5, -0.5)),
+#                      img_dir=join('visualizations', 'camera_images'), **kwargs):
+# =======
                      camera_pose=((3.7, 8, 1.3), (0.5, 0.5, -0.5, -0.5)), robot=True,
                      img_dir=join('visualizations', 'camera_images'), rgb=False):
->>>>>>> d7b62e1d32eb2d0c2ed5325c953ac470eb723fe8
+# >>>>>>> d7b62e1d32eb2d0c2ed5325c953ac470eb723fe8
 
     os.makedirs(img_dir, exist_ok=True)
     world = load_lisdf_pybullet(exp_dir, width=width, height=height, verbose=True)
